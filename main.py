@@ -13,6 +13,9 @@ API_URL = "https://fortnitecontent-website-prod07.ol.epicgames.com/content/api/p
 # Local file to store previous tournaments.
 DATA_FILE = "old_tournaments.json"
 
+# Discord role ID to ping.
+ROLE_ID = "YOUR_ROLE_ID_HERE"
+
 def load_old_data():
     if os.path.exists(DATA_FILE):
         with open(DATA_FILE, "r") as f:
@@ -91,10 +94,11 @@ def build_embed(tourney):
     }
     return embed
 
-def send_webhook(embed):
-    payload = {
-        "embeds": [embed]
-    }
+def send_webhook(embed, content=None):
+    payload = {}
+    if content:
+        payload["content"] = content
+    payload["embeds"] = [embed]
     try:
         response = requests.post(WEBHOOK_URL, json=payload)
         response.raise_for_status()
@@ -127,10 +131,15 @@ def check_for_new_tournaments():
 
     if new_tournaments:
         print(f"Detected {len(new_tournaments)} new tournament(s).")
-        for tourney in new_tournaments:
+        # Always ping once (even if only one)
+        ping_once = True
+        for idx, tourney in enumerate(new_tournaments):
             embed = build_embed(tourney)
-            send_webhook(embed)
-            # Delay 2 seconds between webhook sends to avoid rate limits so adjust if needed
+            if idx == 0 and ping_once:
+                send_webhook(embed, content=f"<@&{ROLE_ID}>")
+            else:
+                send_webhook(embed)
+            # Delay 2 seconds between webhook sends to avoid rate limits
             time.sleep(2)
     else:
         print("No new tournaments detected.")
