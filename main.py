@@ -94,8 +94,8 @@ def build_embed(tourney):
 
 def send_webhook(embed):
     payload = {
-        "embeds": [embed]
         "content": f"<@{PING_USER_ID}>",
+        "embeds": [embed]
     }
     try:
         response = requests.post(WEBHOOK_URL, json=payload)
