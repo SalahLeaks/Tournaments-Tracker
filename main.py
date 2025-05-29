@@ -6,6 +6,7 @@ import re
 
 # Set your Discord webhook URL here.
 WEBHOOK_URL = "https://discord.com/api/webhooks/your_webhook_url_here"
+PING_USER_ID = "123456789012345678"
 
 # The API endpoint for tournament information.
 API_URL = "https://fortnitecontent-website-prod07.ol.epicgames.com/content/api/pages/fortnite-game/tournamentinformation"
@@ -94,6 +95,7 @@ def build_embed(tourney):
 def send_webhook(embed):
     payload = {
         "embeds": [embed]
+        "content": f"<@{PING_USER_ID}>",
     }
     try:
         response = requests.post(WEBHOOK_URL, json=payload)
